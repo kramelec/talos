@@ -6,10 +6,6 @@ replace (
 	// Use nested module.
 	github.com/talos-systems/talos/pkg/machinery => ./pkg/machinery
 
-	// See https://github.com/vmware-tanzu/sonobuoy/issues/1520
-	// Remove when v0.55.1+ is released.
-	github.com/vmware-tanzu/sonobuoy v0.55.0 => github.com/vmware-tanzu/sonobuoy v1.11.5-prerelease.1.0.20211111171810-0e7f9c9059d6
-
 	// forked go-yaml that introduces RawYAML interface, which can be used to populate YAML fields using bytes
 	// which are then encoded as a valid YAML blocks with proper indentiation
 	gopkg.in/yaml.v3 => github.com/unix4ever/yaml v0.0.0-20210315173758-8fb30b8e5a5b
@@ -21,25 +17,25 @@ replace (
 
 // Kubernetes dependencies sharing the same version.
 require (
-	k8s.io/api v0.23.0-alpha.4
-	k8s.io/apimachinery v0.23.0-alpha.4
-	k8s.io/apiserver v0.23.0-alpha.4 // indirect
-	k8s.io/cli-runtime v0.23.0-alpha.4 // indirect
-	k8s.io/client-go v0.23.0-alpha.4
-	k8s.io/component-base v0.23.0-alpha.4 // indirect
-	k8s.io/cri-api v0.23.0-alpha.4
-	k8s.io/kubectl v0.23.0-alpha.4
-	k8s.io/kubelet v0.23.0-alpha.4
+	k8s.io/api v0.23.0
+	k8s.io/apimachinery v0.23.0
+	k8s.io/apiserver v0.23.0 // indirect
+	k8s.io/cli-runtime v0.23.0 // indirect
+	k8s.io/client-go v0.23.0
+	k8s.io/component-base v0.23.0
+	k8s.io/cri-api v0.23.0
+	k8s.io/kubectl v0.23.0
+	k8s.io/kubelet v0.23.0
 )
 
 require (
 	github.com/AlekSi/pointer v1.2.0
 	github.com/BurntSushi/toml v0.4.1
 	github.com/beevik/ntp v0.3.0
+	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/containerd/cgroups v1.0.2
-	github.com/containerd/containerd v1.5.7
+	github.com/containerd/containerd v1.5.8
 	github.com/containerd/cri v1.19.0
-	github.com/containerd/go-cni v1.1.0
 	github.com/containerd/typeurl v1.0.2
 	github.com/containernetworking/cni v1.0.1
 	github.com/containernetworking/plugins v1.0.1
@@ -47,11 +43,11 @@ require (
 	github.com/coreos/go-semver v0.3.0
 	github.com/cosi-project/runtime v0.0.0-20210906201716-5cb7f5002d77
 	github.com/docker/distribution v2.7.1+incompatible
-	github.com/docker/docker v20.10.10+incompatible
+	github.com/docker/docker v20.10.11+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/emicklei/dot v0.16.0
-	github.com/evanphx/json-patch v4.12.0+incompatible
+	github.com/evanphx/json-patch v5.6.0+incompatible
 	github.com/fatih/color v1.13.0
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/fullsailor/pkcs7 v0.0.0-20190404230743-d7302db945fa
@@ -65,63 +61,64 @@ require (
 	github.com/hashicorp/go-getter v1.5.9
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hetznercloud/hcloud-go v1.33.1
-	github.com/insomniacslk/dhcp v0.0.0-20211026125128-ad197bcd36fd
-	github.com/jsimonetti/rtnetlink v0.0.0-20211022192332-93da33804786
+	github.com/insomniacslk/dhcp v0.0.0-20211214070828-5297eed8f489
+	github.com/jsimonetti/rtnetlink v0.0.0-20211203074127-fd9a11f42291
 	github.com/jxskiss/base62 v1.0.0
 	github.com/mattn/go-isatty v0.0.14
 	github.com/mdlayher/arp v0.0.0-20191213142603-f72070a231fc
 	github.com/mdlayher/ethtool v0.0.0-20211028163843-288d040e9d60
 	github.com/mdlayher/genetlink v1.0.0
-	github.com/mdlayher/netlink v1.4.1
+	github.com/mdlayher/netlink v1.4.2
 	github.com/mdlayher/netx v0.0.0-20200512211805-669a06fde734
 	github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417
-	github.com/packethost/packngo v0.19.1
+	github.com/packethost/packngo v0.20.0
 	github.com/pin/tftp v2.1.0+incompatible
 	github.com/prometheus/procfs v0.7.3
-	github.com/rivo/tview v0.0.0-20211109175620-badfa0f0b301
+	github.com/rivo/tview v0.0.0-20211202162923-2a6de950f73b
 	github.com/rs/xid v1.3.0
 	github.com/ryanuber/columnize v2.1.2+incompatible
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.7
-	github.com/smira/go-xz v0.0.0-20201019130106-9921ed7a9935
 	github.com/spf13/cobra v1.2.1
 	github.com/stretchr/testify v1.7.0
 	github.com/talos-systems/crypto v0.3.4
 	github.com/talos-systems/discovery-api v0.1.0
 	github.com/talos-systems/discovery-client v0.1.0
-	github.com/talos-systems/go-blockdevice v0.2.4
+	github.com/talos-systems/go-blockdevice v0.2.6-0.20211214184027-6928ee43c303
 	github.com/talos-systems/go-cmd v0.1.0
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-kmsg v0.1.1
 	github.com/talos-systems/go-loadbalancer v0.1.1
 	github.com/talos-systems/go-procfs v0.1.0
 	github.com/talos-systems/go-retry v0.3.1
-	github.com/talos-systems/go-smbios v0.1.0
+	github.com/talos-systems/go-smbios v0.1.1
 	github.com/talos-systems/grpc-proxy v0.2.0
-	github.com/talos-systems/net v0.3.1-0.20211112122313-0abe5bdae8f8
-	github.com/talos-systems/talos/pkg/machinery v0.0.0-00010101000000-000000000000
+	github.com/talos-systems/net v0.3.1
+	github.com/talos-systems/siderolink v0.1.0
+	github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.2
 	github.com/u-root/u-root v7.0.0+incompatible
 	github.com/vishvananda/netlink v1.1.1-0.20210330154013-f5de75959ad5
-	github.com/vmware-tanzu/sonobuoy v0.55.0
-	github.com/vmware/govmomi v0.27.1
+	github.com/vmware-tanzu/sonobuoy v0.55.1
+	github.com/vmware/govmomi v0.27.2
 	github.com/vmware/vmw-guestinfo v0.0.0-20211006225857-cc1fd90d572c
 	github.com/vultr/metadata v1.0.3
 	go.etcd.io/etcd/api/v3 v3.5.1
 	go.etcd.io/etcd/client/pkg/v3 v3.5.1
 	go.etcd.io/etcd/client/v3 v3.5.1
 	go.etcd.io/etcd/etcdutl/v3 v3.5.1
+	go.uber.org/atomic v1.9.0
 	go.uber.org/zap v1.19.1
-	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2
+	golang.org/x/net v0.0.0-20211205041911-012df41ee64c
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20211113001501-0c823b97ae02
+	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
-	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
-	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20211109202428-0073765f69ba
+	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11
+	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20211124212657-dd7407c86d22
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/freddierice/go-losetup.v1 v1.0.0-20170407175016-fc9adea44124
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	inet.af/netaddr v0.0.0-20211027220019-c74959edd3b6
-	kernel.org/pub/linux/libs/security/libcap/cap v1.2.60
+	kernel.org/pub/linux/libs/security/libcap/cap v1.2.61
 	sigs.k8s.io/yaml v1.3.0
 )
 
@@ -137,24 +134,23 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd // indirect
 	github.com/Microsoft/go-winio v0.4.17 // indirect
-	github.com/Microsoft/hcsshim v0.8.21 // indirect
+	github.com/Microsoft/hcsshim v0.8.23 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/armon/circbuf v0.0.0-20190214190532-5111143e8da2 // indirect
-	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/aws/aws-sdk-go v1.15.78 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/bits-and-blooms/bitset v1.2.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/briandowns/spinner v1.6.1 // indirect
-	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/chai2010/gettext-go v0.0.0-20160711120539-c6fed771bfd5 // indirect
 	github.com/cilium/ebpf v0.7.0 // indirect
 	github.com/containerd/continuity v0.1.0 // indirect
 	github.com/containerd/fifo v1.0.0 // indirect
-	github.com/containerd/ttrpc v1.0.2 // indirect
+	github.com/containerd/go-cni v1.1.0 // indirect
+	github.com/containerd/ttrpc v1.1.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -183,7 +179,7 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/googleapis/gnostic v0.5.5 // indirect
-	github.com/gorilla/mux v1.7.3 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gosuri/uilive v0.0.4 // indirect
 	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
@@ -270,33 +266,32 @@ require (
 	go.opentelemetry.io/otel/metric v0.20.0 // indirect
 	go.opentelemetry.io/otel/trace v0.20.0 // indirect
 	go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5 // indirect
-	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go4.org/intern v0.0.0-20211027215823-ae77deb06f29 // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 // indirect
-	golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa // indirect
+	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect
-	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	golang.zx2c4.com/wireguard v0.0.0-20211109020618-685490f568cf // indirect
+	golang.zx2c4.com/wireguard v0.0.0-20211123210315-387f7c461a16 // indirect
 	google.golang.org/api v0.44.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20211112145013-271947fe86fd // indirect
+	google.golang.org/genproto v0.0.0-20211203200212-54befc351ae9 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	honnef.co/go/tools v0.2.1 // indirect
+	honnef.co/go/tools v0.2.2 // indirect
 	inet.af/tcpproxy v0.0.0-20200125044825-b6bb9b5b8252 // indirect
 	k8s.io/klog v1.0.0 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
-	k8s.io/kube-openapi v0.0.0-20210817084001-7fbd8d59e5b8 // indirect
+	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
 	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b // indirect
-	kernel.org/pub/linux/libs/security/libcap/psx v1.2.60 // indirect
+	kernel.org/pub/linux/libs/security/libcap/psx v1.2.61 // indirect
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
-	sigs.k8s.io/kustomize/api v0.8.11 // indirect
-	sigs.k8s.io/kustomize/kyaml v0.11.0 // indirect
+	sigs.k8s.io/kustomize/api v0.10.1 // indirect
+	sigs.k8s.io/kustomize/kyaml v0.13.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
 )

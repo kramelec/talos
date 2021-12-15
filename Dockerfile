@@ -127,6 +127,7 @@ ARG CGO_ENABLED
 ENV CGO_ENABLED ${CGO_ENABLED}
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
+ENV PROTOTOOL_CACHE_PATH /.cache/prototool
 ARG SOURCE_DATE_EPOCH
 ENV SOURCE_DATE_EPOCH ${SOURCE_DATE_EPOCH}
 WORKDIR /src
@@ -144,7 +145,28 @@ RUN --mount=type=cache,target=/.cache go mod verify
 
 # The generate target generates code from protobuf service definitions and machinery config.
 
+# generate API descriptors
+FROM build AS api-descriptors-build
+WORKDIR /src/api
+COPY api .
+RUN --mount=type=cache,target=/.cache prototool format --overwrite --protoc-bin-path=/toolchain/bin/protoc --protoc-wkt-path=/toolchain/include
+RUN --mount=type=cache,target=/.cache prototool break descriptor-set --output-path=api.descriptors --protoc-bin-path=/toolchain/bin/protoc --protoc-wkt-path=/toolchain/include
+
+FROM --platform=${BUILDPLATFORM} scratch AS api-descriptors
+COPY --from=api-descriptors-build /src/api/api.descriptors /api/api.descriptors
+
+# format protobuf service definitions
+FROM build AS proto-format-build
+WORKDIR /src/api
+COPY api .
+RUN --mount=type=cache,target=/.cache prototool format --overwrite --protoc-bin-path=/toolchain/bin/protoc --protoc-wkt-path=/toolchain/include
+
+FROM --platform=${BUILDPLATFORM} scratch AS fmt-protobuf
+COPY --from=proto-format-build /src/api/ /api/
+
+# compile protobuf service definitions
 FROM build AS generate-build
+COPY --from=proto-format-build /src/api /api/
 # Common needs to be at or near the top to satisfy the subsequent imports
 COPY ./api/vendor/ /api/vendor/
 COPY ./api/common/common.proto /api/common/common.proto
@@ -179,6 +201,7 @@ RUN --mount=type=cache,target=/.cache go generate ./...
 RUN gofumports -w -local github.com/talos-systems/talos ./
 
 FROM --platform=${BUILDPLATFORM} scratch AS generate
+COPY --from=proto-format-build /src/api /api/
 COPY --from=generate-build /api/common/*.pb.go /pkg/machinery/api/common/
 COPY --from=generate-build /api/security/*.pb.go /pkg/machinery/api/security/
 COPY --from=generate-build /api/machine/*.pb.go /pkg/machinery/api/machine/
@@ -483,7 +506,7 @@ ARG TARGETARCH
 RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /installer
 RUN chmod +x /installer
 
-FROM alpine:3.14.3 AS unicode-pf2
+FROM alpine:3.15.0 AS unicode-pf2
 RUN apk add --no-cache --update --no-scripts grub
 
 FROM scratch AS install-artifacts-amd64
@@ -510,7 +533,7 @@ FROM install-artifacts-${INSTALLER_ARCH} AS install-artifacts
 COPY --from=pkg-grub / /
 COPY --from=unicode-pf2 /usr/share/grub/unicode.pf2 /usr/share/grub/unicode.pf2
 
-FROM alpine:3.14.3 AS installer
+FROM alpine:3.15.0 AS installer
 RUN apk add --no-cache --update --no-scripts \
     bash \
     efibootmgr \
@@ -550,6 +573,8 @@ ONBUILD RUN find /rootfs \
     && rm -rf /initramfs
 ONBUILD WORKDIR /
 
+FROM installer AS imager
+
 # The test target performs tests on the source code.
 
 FROM base AS unit-tests-runner
@@ -557,7 +582,10 @@ RUN unlink /etc/ssl
 COPY --from=rootfs / /
 ARG TESTPKGS
 ENV PLATFORM container
-RUN --security=insecure --mount=type=cache,id=testspace,target=/tmp --mount=type=cache,target=/.cache go test -v -covermode=atomic -coverprofile=coverage.txt -coverpkg=${TESTPKGS} -count 1 -p 4 ${TESTPKGS}
+ARG GO_LDFLAGS
+RUN --security=insecure --mount=type=cache,id=testspace,target=/tmp --mount=type=cache,target=/.cache go test -v \
+    -ldflags "${GO_LDFLAGS}" \
+    -covermode=atomic -coverprofile=coverage.txt -coverpkg=${TESTPKGS} -count 1 -p 4 ${TESTPKGS}
 FROM scratch AS unit-tests
 COPY --from=unit-tests-runner /src/coverage.txt /coverage.txt
 
@@ -569,7 +597,10 @@ COPY --from=rootfs / /
 ARG TESTPKGS
 ENV PLATFORM container
 ENV CGO_ENABLED 1
-RUN --security=insecure --mount=type=cache,id=testspace,target=/tmp --mount=type=cache,target=/.cache go test -v -race -count 1 -p 4 ${TESTPKGS}
+ARG GO_LDFLAGS
+RUN --security=insecure --mount=type=cache,id=testspace,target=/tmp --mount=type=cache,target=/.cache go test -v \
+    -ldflags "${GO_LDFLAGS}" \
+    -race -count 1 -p 4 ${TESTPKGS}
 
 # The integration-test targets builds integration test binary.
 
@@ -627,12 +658,12 @@ RUN --mount=type=cache,target=/.cache FILES="$(gofumports -l -local github.com/t
 FROM base AS lint-protobuf
 WORKDIR /src/api
 COPY api .
-COPY prototool.yaml .
-RUN prototool lint --protoc-bin-path=/toolchain/bin/protoc --protoc-wkt-path=/toolchain/include
+RUN --mount=type=cache,target=/.cache prototool lint --protoc-bin-path=/toolchain/bin/protoc --protoc-wkt-path=/toolchain/include
+RUN --mount=type=cache,target=/.cache prototool break check --descriptor-set-path=api.descriptors --protoc-bin-path=/toolchain/bin/protoc --protoc-wkt-path=/toolchain/include
 
 # The markdownlint target performs linting on Markdown files.
 
-FROM node:17.1.0-alpine AS lint-markdown
+FROM node:17.2.0-alpine AS lint-markdown
 RUN apk add --no-cache findutils
 RUN npm i -g markdownlint-cli@0.23.2
 RUN npm i -g textlint@11.7.6

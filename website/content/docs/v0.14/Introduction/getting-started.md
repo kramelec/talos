@@ -43,8 +43,8 @@ The latest ISO image can be found on the Github [Releases](https://github.com/ta
 
 For self-built media and network booting, you can use the kernel and initramfs:
 
-- X86: [https://github.com/talos-systems/talos/releases/download/v0.14.0/boot-amd64.tar.gz](https://github.com/talos-systems/talos/releases/download/v0.14.0/boot-amd64.tar.gz)
-- ARM64: [https://github.com/talos-systems/talos/releases/download/v0.14.0/boot-ard64.tar.gz](https://github.com/talos-systems/talos/releases/download/v0.14.0/boot-ard64.tar.gz)
+- X86: [vmlinuz-amd64](https://github.com/talos-systems/talos/releases/download/v0.14.0/vmlinuz-amd64) [initramfs-amd64.xz](https://github.com/talos-systems/talos/releases/download/v0.14.0/initramfs-amd64.xz)
+- ARM64: [vmlinuz-arm64](https://github.com/talos-systems/talos/releases/download/v0.14.0/vmlinuz-arm64) [initramfs-arm64.xz](https://github.com/talos-systems/talos/releases/download/v0.14.0/initramfs-arm64.xz)
 
 When booted from the ISO, Talos will run in RAM, and it will not install itself
 until it is provided a configuration.
@@ -370,7 +370,15 @@ by forgetting to declare the right one explicitly.
 Worse, if you set several nodes as defaults, you could, with one `talosctl upgrade`
 command upgrade your whole cluster all at the same time.
 It's a powerful tool, and with that comes great responsibility.
-The author of this document does not set a default node.
+
+The author of this document generally sets a single controlplane node to be the
+default node, which provides the most flexible default operation while limiting
+the scope of the disaster should a command be entered erroneously:
+
+```sh
+  talosctl --talosconfig=./talosconfig \
+    config node 192.168.0.2
+```
 
 You may simply provide `-n` or `--nodes` to any `talosctl` command to
 supply the node or (comma-delimited) nodes on which you wish to perform the
@@ -426,6 +434,9 @@ Bootstrapping your Kubernetes cluster with Talos is as simple as:
 ```sh
   talosctl bootstrap --nodes 192.168.0.2
 ```
+
+**IMPORTANT**: the bootstrap operation should only be called **ONCE** and only on a **SINGLE**
+controlplane node!
 
 The IP there can be any of your controlplanes (or the loadbalancer, if you have
 one).

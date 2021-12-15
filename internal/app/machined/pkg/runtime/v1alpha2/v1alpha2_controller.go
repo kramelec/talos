@@ -28,10 +28,12 @@ import (
 	"github.com/talos-systems/talos/internal/app/machined/pkg/controllers/perf"
 	runtimecontrollers "github.com/talos-systems/talos/internal/app/machined/pkg/controllers/runtime"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/controllers/secrets"
+	"github.com/talos-systems/talos/internal/app/machined/pkg/controllers/siderolink"
 	timecontrollers "github.com/talos-systems/talos/internal/app/machined/pkg/controllers/time"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/controllers/v1alpha1"
 	"github.com/talos-systems/talos/internal/app/machined/pkg/runtime"
 	runtimelogging "github.com/talos-systems/talos/internal/app/machined/pkg/runtime/logging"
+	"github.com/talos-systems/talos/internal/app/machined/pkg/system"
 	"github.com/talos-systems/talos/pkg/logging"
 	talosconfig "github.com/talos-systems/talos/pkg/machinery/config"
 	"github.com/talos-systems/talos/pkg/machinery/constants"
@@ -73,7 +75,7 @@ func NewController(v1alpha1Runtime runtime.Runtime) (*Controller, error) {
 }
 
 // Run the controller runtime.
-func (ctrl *Controller) Run(ctx context.Context) error {
+func (ctrl *Controller) Run(ctx context.Context, drainer *runtime.Drainer) error {
 	// adjust the log level based on machine configuration
 	go ctrl.watchMachineConfig(ctx)
 
@@ -106,9 +108,16 @@ func (ctrl *Controller) Run(ctx context.Context) error {
 		&k8s.ControlPlaneStaticPodController{},
 		&k8s.EndpointController{},
 		&k8s.ExtraManifestController{},
+		&k8s.KubeletConfigController{},
+		&k8s.KubeletServiceController{
+			V1Alpha1Services: system.Services(ctrl.v1alpha1Runtime),
+		},
+		&k8s.KubeletSpecController{},
 		&k8s.KubeletStaticPodController{},
 		&k8s.ManifestController{},
 		&k8s.ManifestApplyController{},
+		&k8s.NodeIPController{},
+		&k8s.NodeIPConfigController{},
 		&k8s.NodenameController{},
 		&k8s.RenderSecretsStaticPodController{},
 		&kubespan.ConfigController{},
@@ -170,17 +179,30 @@ func (ctrl *Controller) Run(ctx context.Context) error {
 		&network.TimeServerMergeController{},
 		&network.TimeServerSpecController{},
 		&perf.StatsController{},
+		&runtimecontrollers.EventsSinkController{
+			V1Alpha1Events: ctrl.v1alpha1Runtime.Events(),
+			Cmdline:        procfs.ProcCmdline(),
+			Drainer:        drainer,
+		},
 		&runtimecontrollers.KernelParamConfigController{},
 		&runtimecontrollers.KernelParamDefaultsController{
 			V1Alpha1Mode: ctrl.v1alpha1Runtime.State().Platform().Mode(),
 		},
 		&runtimecontrollers.KernelParamSpecController{},
+		&runtimecontrollers.KmsgLogDeliveryController{
+			Cmdline: procfs.ProcCmdline(),
+			Drainer: drainer,
+		},
 		&secrets.APIController{},
 		&secrets.APICertSANsController{},
 		&secrets.EtcdController{},
+		&secrets.KubeletController{},
 		&secrets.KubernetesController{},
 		&secrets.KubernetesCertSANsController{},
 		&secrets.RootController{},
+		&siderolink.ManagerController{
+			Cmdline: procfs.ProcCmdline(),
+		},
 	} {
 		if err := ctrl.controllerRuntime.RegisterController(c); err != nil {
 			return err

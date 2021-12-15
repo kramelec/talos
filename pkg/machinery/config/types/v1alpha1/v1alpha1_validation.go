@@ -11,10 +11,10 @@ import (
 	"net"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
-	valid "github.com/asaskevich/govalidator"
 	"github.com/hashicorp/go-multierror"
 	"github.com/talos-systems/go-debug"
 	talosnet "github.com/talos-systems/net"
@@ -117,6 +117,12 @@ func (c *Config) Validate(mode config.RuntimeMode, options ...config.ValidationO
 			if d.VIPConfig() != nil {
 				result = multierror.Append(result, errors.New("virtual (shared) IP is not allowed on non-controlplane nodes"))
 			}
+
+			for _, vlan := range d.Vlans() {
+				if vlan.VIPConfig() != nil {
+					result = multierror.Append(result, errors.New("virtual (shared) IP is not allowed on non-controlplane nodes"))
+				}
+			}
 		}
 
 	case machine.TypeUnknown:
@@ -216,6 +222,16 @@ func (c *Config) Validate(mode config.RuntimeMode, options ...config.ValidationO
 	return warnings, result.ErrorOrNil()
 }
 
+var rxDNSName = regexp.MustCompile(`^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`)
+
+func isValidDNSName(name string) bool {
+	if name == "" || len(name)-strings.Count(name, ".") > 255 {
+		return false
+	}
+
+	return rxDNSName.MatchString(name)
+}
+
 // Validate validates the config.
 //
 //nolint:gocyclo
@@ -234,7 +250,7 @@ func (c *ClusterConfig) Validate() error {
 		result = multierror.Append(result, fmt.Errorf("invalid controlplane endpoint: %w", err))
 	}
 
-	if c.ClusterNetwork != nil && !valid.IsDNSName(c.ClusterNetwork.DNSDomain) {
+	if c.ClusterNetwork != nil && !isValidDNSName(c.ClusterNetwork.DNSDomain) {
 		result = multierror.Append(result, fmt.Errorf("%q is not a valid DNS name", c.ClusterNetwork.DNSDomain))
 	}
 
@@ -548,8 +564,8 @@ func checkWireguard(b *DeviceWireguardConfig) error {
 		}
 
 		if peer.WireguardEndpoint != "" {
-			if _, err := net.ResolveUDPAddr("", peer.WireguardEndpoint); err != nil {
-				result = multierror.Append(result, fmt.Errorf("peer endpoint %q is invalid: %w", peer.WireguardEndpoint, err))
+			if !talosnet.AddressContainsPort(peer.WireguardEndpoint) {
+				result = multierror.Append(result, fmt.Errorf("peer endpoint %q is invalid", peer.WireguardEndpoint))
 			}
 		}
 

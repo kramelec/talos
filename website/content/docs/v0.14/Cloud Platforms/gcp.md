@@ -239,7 +239,7 @@ gcloud compute images delete \
 Using GCP deployment manager automatically creates a Google Storage bucket and uploads the Talos image to it.
 Once the deployment is complete the generated `talosconfig` and `kubeconfig` files are uploaded to the bucket.
 
-By default this setup creates a three node control plane and a single worker in `us-west2-c`
+By default this setup creates a three node control plane and a single worker in `us-west1-b`
 
 First we need to create a folder to store our deployment manifests and perform all subsequent operations from that folder.
 
@@ -254,7 +254,9 @@ We need to download two deployment manifests for the deployment from the Talos g
 
 ```bash
 curl -fsSLO "https://raw.githubusercontent.com/talos-systems/talos/master/website/content/docs/v0.14/Cloud%20Platforms/gcp/config.yaml"
-curl -fsSLO "https://raw.githubusercontent.com/talos-systems/talos/master/website/content/docs/v0.14/Cloud%20Platforms/gcp/talos-ha.yaml"
+curl -fsSLO "https://raw.githubusercontent.com/talos-systems/talos/master/website/content/docs/v0.14/Cloud%20Platforms/gcp/talos-ha.jinja"
+# if using ccm
+curl -fsSLO "https://raw.githubusercontent.com/talos-systems/talos/master/website/content/docs/v0.14/Cloud%20Platforms/gcp/gcp-ccm.yaml"
 ```
 
 ### Updating the config
@@ -271,8 +273,9 @@ resources:
   - name: talos-ha
     type: talos-ha.jinja
     properties:
-      zone: us-west2-c
+      zone: us-west1-b
       talosVersion: v0.13.2
+      externalCloudProvider: false
       controlPlaneNodeCount: 5
       controlPlaneNodeType: n1-standard-1
       workerNodeCount: 3
@@ -281,6 +284,16 @@ outputs:
   - name: bucketName
     value: $(ref.talos-ha.bucketName)
 ```
+
+#### Enabling external cloud provider
+
+Note: The `externalCloudProvider` property is set to `false` by default.
+The [manifest](https://raw.githubusercontent.com/talos-systems/talos/master/website/content/docs/v0.14/Cloud%20Platforms/gcp/gcp-ccm.yaml#L256) used for deploying the ccm (cloud controller manager) is currently using the GCP ccm provided by openshift since there are no public images for the [ccm](https://github.com/kubernetes/cloud-provider-gcp) yet.
+
+> Since the routes controller is disabled while deploying the CCM, the CNI pods needs to be restarted after the CCM deployment is complete to remove the `node.kubernetes.io/network-unavailable` taint.
+See [Nodes network-unavailable taint not removed after installing ccm](https://github.com/kubernetes/cloud-provider-gcp/issues/291) for more information
+
+Use a custom built image for the ccm deployment if required.
 
 ### Creating the deployment
 
@@ -303,13 +316,70 @@ First we need to get the deployment outputs.
 OUTPUTS=$(gcloud deployment-manager deployments describe "${DEPLOYMENT_NAME}" --format json | jq '.outputs[]')
 
 BUCKET_NAME=$(jq -r '. | select(.name == "bucketName").finalValue' <<< "${OUTPUTS}")
+# used when cloud controller is enabled
+SERVICE_ACCOUNT=$(jq -r '. | select(.name == "serviceAccount").finalValue' <<< "${OUTPUTS}")
+PROJECT=$(jq -r '. | select(.name == "project").finalValue' <<< "${OUTPUTS}")
+```
+
+Note: If cloud controller manager is enabled, the below command needs to be run to allow the controller custom role to access cloud resources
+
+```bash
+gcloud projects add-iam-policy-binding \
+    "${PROJECT}" \
+    --member "serviceAccount:${SERVICE_ACCOUNT}" \
+    --role roles/iam.serviceAccountUser
+
+gcloud projects add-iam-policy-binding \
+    "${PROJECT}" \
+    --member serviceAccount:"${SERVICE_ACCOUNT}" \
+    --role roles/compute.admin
+
+gcloud projects add-iam-policy-binding \
+    "${PROJECT}" \
+    --member serviceAccount:"${SERVICE_ACCOUNT}" \
+    --role roles/compute.loadBalancerAdmin
 ```
 
 ### Downloading talos and kube config
 
+In addition to the `talosconfig` and `kubeconfig` files, the storage bucket contains the `controlplane.yaml` and `worker.yaml` files used to join additional nodes to the cluster.
+
 ```bash
 gsutil cp "gs://${BUCKET_NAME}/generated/talosconfig" .
 gsutil cp "gs://${BUCKET_NAME}/generated/kubeconfig" .
+```
+
+### Deploying the cloud controller manager
+
+```bash
+kubectl \
+  --kubeconfig kubeconfig \
+  --namespace kube-system \
+  apply \
+  --filename gcp-ccm.yaml
+#  wait for the ccm to be up
+kubectl \
+  --kubeconfig kubeconfig \
+  --namespace kube-system \
+  rollout status \
+  daemonset cloud-controller-manager
+```
+
+If the cloud controller manager is enabled, we need to restart the CNI pods to remove the `node.kubernetes.io/network-unavailable` taint.
+
+```bash
+# restart the CNI pods, in this case flannel
+kubectl \
+  --kubeconfig kubeconfig \
+  --namespace kube-system \
+  rollout restart \
+  daemonset kube-flannel
+# wait for the pods to be restarted
+kubectl \
+  --kubeconfig kubeconfig \
+  --namespace kube-system \
+  rollout status \
+  daemonset kube-flannel
 ```
 
 ### Check cluster status
@@ -324,8 +394,29 @@ kubectl \
 
 Warning: This will delete the deployment and all resources associated with it.
 
+Run below if cloud controller manager is enabled
+
+```bash
+gcloud projects remove-iam-policy-binding \
+    "${PROJECT}" \
+    --member "serviceAccount:${SERVICE_ACCOUNT}" \
+    --role roles/iam.serviceAccountUser
+
+gcloud projects remove-iam-policy-binding \
+    "${PROJECT}" \
+    --member serviceAccount:"${SERVICE_ACCOUNT}" \
+    --role roles/compute.admin
+
+gcloud projects remove-iam-policy-binding \
+    "${PROJECT}" \
+    --member serviceAccount:"${SERVICE_ACCOUNT}" \
+    --role roles/compute.loadBalancerAdmin
+```
+
+Now we can finally remove the deployment
+
 ```bash
 # delete the objects in the bucket first
-gsutil rm -r "gs://${BUCKET_NAME}"
-gcloud deployment-manager deployments delete "${DEPLOYMENT_NAME}"
+gsutil -m rm -r "gs://${BUCKET_NAME}"
+gcloud deployment-manager deployments delete "${DEPLOYMENT_NAME}" --quiet
 ```

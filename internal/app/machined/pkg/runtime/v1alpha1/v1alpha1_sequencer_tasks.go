@@ -155,6 +155,8 @@ func CreateSystemCgroups(seq runtime.Sequence, data interface{}) (runtime.TaskEx
 		groups := []string{
 			constants.CgroupInit,
 			constants.CgroupRuntime,
+			constants.CgroupPodRuntime,
+			constants.CgroupKubelet,
 		}
 
 		for _, c := range groups {
@@ -435,7 +437,16 @@ func LoadConfig(seq runtime.Sequence, data interface{}) (runtime.TaskExecutionFu
 
 			logger.Printf("storing config in memory")
 
-			return r.SetConfig(b)
+			cfg, e := r.LoadAndValidateConfig(b)
+			if e != nil {
+				r.Events().Publish(&machineapi.ConfigLoadErrorEvent{
+					Error: err.Error(),
+				})
+
+				return e
+			}
+
+			return r.SetConfig(cfg)
 		}
 
 		cfg, err := configloader.NewFromFile(constants.ConfigPath)
@@ -453,16 +464,7 @@ func LoadConfig(seq runtime.Sequence, data interface{}) (runtime.TaskExecutionFu
 
 		logger.Printf("persistence is enabled, using existing config on disk")
 
-		b, err := cfg.Bytes()
-		if err != nil {
-			r.Events().Publish(&machineapi.ConfigLoadErrorEvent{
-				Error: err.Error(),
-			})
-
-			return err
-		}
-
-		return r.SetConfig(b)
+		return r.SetConfig(cfg)
 	}, "loadConfig"
 }
 
@@ -635,7 +637,6 @@ func StartAllServices(seq runtime.Sequence, data interface{}) (runtime.TaskExecu
 		svcs.Load(
 			&services.APID{},
 			&services.CRI{},
-			&services.Kubelet{},
 		)
 
 		switch t := r.Config().Machine().Type(); t {
@@ -1752,6 +1753,14 @@ func ActivateLogicalVolumes(seq runtime.Sequence, data interface{}) (runtime.Tas
 //nolint:gocyclo
 func KexecPrepare(seq runtime.Sequence, data interface{}) (runtime.TaskExecutionFunc, string) {
 	return func(ctx context.Context, logger *log.Logger, r runtime.Runtime) error {
+		if req, ok := data.(*machineapi.RebootRequest); ok {
+			if req.Mode == machineapi.RebootRequest_POWERCYCLE {
+				log.Print("kexec skipped as reboot with power cycle was requested")
+
+				return nil
+			}
+		}
+
 		if r.Config() == nil {
 			return nil
 		}

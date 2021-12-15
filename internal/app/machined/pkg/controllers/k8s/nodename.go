@@ -88,7 +88,7 @@ func (ctrl *NodenameController) Run(ctx context.Context, r controller.Runtime, l
 
 		if err = r.Modify(
 			ctx,
-			k8s.NewNodename(k8s.ControlPlaneNamespaceName, k8s.NodenameID),
+			k8s.NewNodename(k8s.NamespaceName, k8s.NodenameID),
 			func(r resource.Resource) error {
 				nodename := r.(*k8s.Nodename) //nolint:errcheck,forcetypeassert
 

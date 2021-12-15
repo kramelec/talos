@@ -93,7 +93,7 @@ talosctl cluster create [flags]
       --bad-rtc                                 launch VM with bad RTC state (QEMU only)
       --cidr string                             CIDR of the cluster network (IPv4, ULA network for IPv6 is derived in automated way) (default "10.5.0.0/24")
       --cni-bin-path strings                    search path for CNI binaries (VM only) (default [/home/user/.talos/cni/bin])
-      --cni-bundle-url string                   URL to download CNI bundle from (VM only) (default "https://github.com/talos-systems/talos/releases/download/v0.14.0-alpha.1/talosctl-cni-bundle-${ARCH}.tar.gz")
+      --cni-bundle-url string                   URL to download CNI bundle from (VM only) (default "https://github.com/talos-systems/talos/releases/download/v0.14.0-alpha.2/talosctl-cni-bundle-${ARCH}.tar.gz")
       --cni-cache-dir string                    CNI cache directory path (VM only) (default "/home/user/.talos/cni/cache")
       --cni-conf-dir string                     CNI config directory path (VM only) (default "/home/user/.talos/cni/conf.d")
       --config-patch string                     patch generated machineconfigs (applied to all node types)
@@ -110,6 +110,7 @@ talosctl cluster create [flags]
       --encrypt-state                           enable state partition encryption
       --endpoint string                         use endpoint instead of provider defaults
   -p, --exposed-ports string                    Comma-separated list of ports/protocols to expose on init node. Ex -p <hostPort>:<containerPort>/<protocol (tcp or udp)> (Docker provisioner only)
+      --extra-boot-kernel-args string           add extra kernel args to the initial boot from vmlinuz and initramfs (QEMU only)
   -h, --help                                    help for create
       --image string                            the image to use (default "ghcr.io/talos-systems/talos:latest")
       --init-node-as-endpoint                   use init node as endpoint instead of any load balancer endpoint
@@ -119,7 +120,7 @@ talosctl cluster create [flags]
       --ipv4                                    enable IPv4 network in the cluster (default true)
       --ipv6                                    enable IPv6 network in the cluster (QEMU provisioner only)
       --iso-path string                         the ISO path to use for the initial boot (VM only)
-      --kubernetes-version string               desired kubernetes version to run (default "1.23.0-beta.0")
+      --kubernetes-version string               desired kubernetes version to run (default "1.23.0")
       --masters int                             the number of masters to create (default 1)
       --memory int                              the limit on memory usage in MB (each container/VM) (default 2048)
       --mtu int                                 MTU of the cluster network (default 1500)
@@ -252,11 +253,11 @@ A collection of commands for managing local docker-based or QEMU-based clusters
 
 ## talosctl completion
 
-Output shell completion code for the specified shell (bash or zsh)
+Output shell completion code for the specified shell (bash, fish or zsh)
 
 ### Synopsis
 
-Output shell completion code for the specified shell (bash or zsh).
+Output shell completion code for the specified shell (bash, fish or zsh).
 The shell code must be evaluated to provide interactive
 completion of talosctl commands.  This can be done by sourcing it from
 the .bash_profile.
@@ -291,10 +292,14 @@ talosctl completion SHELL [flags]
 		source '$HOME/.talos/completion.bash.inc'
 		" >> $HOME/.bash_profile
 	source $HOME/.bash_profile
+# Load the talosctl completion code for fish[1] into the current shell
+	talosctl completion fish | source
+# Set the talosctl completion code for fish[1] to autoload on startup
+    talosctl completion fish > ~/.config/fish/completions/talosctl.fish
 # Load the talosctl completion code for zsh[1] into the current shell
 	source <(talosctl completion zsh)
 # Set the talosctl completion code for zsh[1] to autoload on startup
-talosctl completion zsh > "${fpath[1]}/_talosctl"
+    talosctl completion zsh > "${fpath[1]}/_talosctl"
 ```
 
 ### Options
@@ -1261,6 +1266,10 @@ Generate CAs, certificates, and private keys
 
 Get a specific resource or list of resources.
 
+### Synopsis
+
+Similar to 'kubectl get', 'talosctl get' returns a set of resources from the OS.  To get a list of all available resource definitions, issue 'talosctl get rd'
+
 ```
 talosctl get <type> [<id>] [flags]
 ```
@@ -1271,7 +1280,7 @@ talosctl get <type> [<id>] [flags]
   -h, --help               help for get
   -i, --insecure           get resources using the insecure (encrypted with no auth) maintenance service
       --namespace string   resource namespace (default is to use default namespace per resource)
-  -o, --output string      output mode (table, yaml) (default "table")
+  -o, --output string      output mode (json, table, yaml) (default "table")
   -w, --watch              watch resource changes
 ```
 
@@ -1666,7 +1675,8 @@ talosctl reboot [flags]
 ### Options
 
 ```
-  -h, --help   help for reboot
+  -h, --help          help for reboot
+  -m, --mode string   select the reboot mode: "default", "powercyle" (skips kexec) (default "default")
 ```
 
 ### Options inherited from parent commands
@@ -1985,7 +1995,8 @@ talosctl upgrade-k8s [flags]
       --endpoint string   the cluster control plane endpoint
       --from string       the Kubernetes control plane version to upgrade from
   -h, --help              help for upgrade-k8s
-      --to string         the Kubernetes control plane version to upgrade to (default "1.23.0-beta.0")
+      --to string         the Kubernetes control plane version to upgrade to (default "1.23.0")
+      --upgrade-kubelet   upgrade kubelet service (default true)
 ```
 
 ### Options inherited from parent commands
@@ -2110,7 +2121,7 @@ A CLI for out-of-band management of Kubernetes nodes created by Talos
 * [talosctl apply-config](#talosctl-apply-config)	 - Apply a new configuration to a node
 * [talosctl bootstrap](#talosctl-bootstrap)	 - Bootstrap the etcd cluster on the specified node.
 * [talosctl cluster](#talosctl-cluster)	 - A collection of commands for managing local docker-based or QEMU-based clusters
-* [talosctl completion](#talosctl-completion)	 - Output shell completion code for the specified shell (bash or zsh)
+* [talosctl completion](#talosctl-completion)	 - Output shell completion code for the specified shell (bash, fish or zsh)
 * [talosctl config](#talosctl-config)	 - Manage the client configuration file (talosconfig)
 * [talosctl conformance](#talosctl-conformance)	 - Run conformance tests
 * [talosctl containers](#talosctl-containers)	 - List containers

@@ -13,7 +13,7 @@ import (
 
 const (
 	// DefaultKernelVersion is the default Linux kernel version.
-	DefaultKernelVersion = "5.15.1-talos"
+	DefaultKernelVersion = "5.15.6-talos"
 
 	// KernelParamConfig is the kernel parameter name for specifying the URL.
 	// to the config.
@@ -29,6 +29,14 @@ const (
 	// KernelParamBoard is the kernel parameter name for specifying the
 	// SBC.
 	KernelParamBoard = "talos.board"
+
+	// KernelParamEventsSink is the kernel parameter name for specifying the
+	// events sink server.
+	KernelParamEventsSink = "talos.events.sink"
+
+	// KernelParamLoggingKernel is the kernel parameter name for specifying the
+	// kernel log delivery destination.
+	KernelParamLoggingKernel = "talos.logging.kernel"
 
 	// BoardNone indicates that the install is not for a specific board.
 	BoardNone = "none"
@@ -64,6 +72,9 @@ const (
 
 	// KernelParamPanic is the kernel parameter name for specifying the time to wait until rebooting after kernel panic (0 disables reboot).
 	KernelParamPanic = "panic"
+
+	// KernelParamSideroLink is the kernel paramater name to specify SideroLink API endpoint.
+	KernelParamSideroLink = "siderolink.api"
 
 	// NewRoot is the path where the switchroot target is mounted.
 	NewRoot = "/root"
@@ -203,7 +214,7 @@ const (
 	SystemKubeletPKIDir = "/system/secrets/kubelet"
 
 	// DefaultKubernetesVersion is the default target version of the control plane.
-	DefaultKubernetesVersion = "1.23.0-beta.0"
+	DefaultKubernetesVersion = "1.23.0"
 
 	// DefaultControlPlanePort is the default port to use for the control plane.
 	DefaultControlPlanePort = 6443
@@ -246,6 +257,18 @@ const (
 
 	// KubeletKubeconfig is the generated kubeconfig for kubelet.
 	KubeletKubeconfig = "/etc/kubernetes/kubeconfig-kubelet"
+
+	// KubeletSystemReservedCPU cpu system reservation value for kubelet kubeconfig.
+	KubeletSystemReservedCPU = "50m"
+
+	// KubeletSystemReservedMemory memory system reservation value for kubelet kubeconfig.
+	KubeletSystemReservedMemory = "128Mi"
+
+	// KubeletSystemReservedPid pid system reservation value for kubelet kubeconfig.
+	KubeletSystemReservedPid = "100"
+
+	// KubeletSystemReservedEphemeralStorage ephemeral-storage system reservation value for kubelet kubeconfig.
+	KubeletSystemReservedEphemeralStorage = "256Mi"
 
 	// DefaultEtcdVersion is the default target version of etcd.
 	DefaultEtcdVersion = "v3.5.1"
@@ -314,7 +337,7 @@ const (
 	TrustdUserID = 51
 
 	// DefaultContainerdVersion is the default container runtime version.
-	DefaultContainerdVersion = "1.5.7"
+	DefaultContainerdVersion = "1.5.8"
 
 	// SystemContainerdNamespace is the Containerd namespace for Talos services.
 	SystemContainerdNamespace = "system"
@@ -401,6 +424,12 @@ const (
 	// CgroupRuntime is the cgroup name for containerd runtime processes.
 	CgroupRuntime = CgroupSystem + "/runtime"
 
+	// CgroupPodRuntime is the cgroup name for kubernetes containerd runtime processes.
+	CgroupPodRuntime = "/podruntime/runtime"
+
+	// CgroupKubelet is the cgroup name for kubelet process.
+	CgroupKubelet = "/podruntime/kubelet"
+
 	// FlannelCNI is the string to use Tanos-managed Flannel CNI (default).
 	FlannelCNI = "flannel"
 
@@ -426,7 +455,12 @@ const (
 	DefaultDNSDomain = "cluster.local"
 
 	// BootTimeout is the timeout to run all services.
-	BootTimeout = 15 * time.Minute
+	BootTimeout = 35 * time.Minute
+
+	// EtcdJoinTimeout is the timeout for etcd to join the existing cluster.
+	//
+	// BootTimeout should be higher than EtcdJoinTimeout.
+	EtcdJoinTimeout = 30 * time.Minute
 
 	// NodeReadyTimeout is the timeout to wait for the node to be ready (CNI to be running).
 	// For bootstrap API, this includes time to run bootstrap.
@@ -521,6 +555,12 @@ const (
 
 	// LoggingFormatJSONLines represents "JSON lines" logging format.
 	LoggingFormatJSONLines = "json_lines"
+
+	// SideroLinkName is the interface name for SideroLink.
+	SideroLinkName = "siderolink"
+
+	// SideroLinkDefaultPeerKeepalive is the interval at which Wireguard Peer Keepalives should be sent.
+	SideroLinkDefaultPeerKeepalive = 25 * time.Second
 )
 
 // See https://linux.die.net/man/3/klogctl

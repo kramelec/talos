@@ -270,6 +270,34 @@ certSANs:
 <hr />
 <div class="dd">
 
+<code>controlPlane</code>  <i><a href="#machinecontrolplaneconfig">MachineControlPlaneConfig</a></i>
+
+</div>
+<div class="dt">
+
+Provides machine specific contolplane configuration options.
+
+
+
+Examples:
+
+
+``` yaml
+controlPlane:
+    # Controller manager machine specific configuration options.
+    controllerManager:
+        disabled: false # Disable kube-controller-manager on the node.
+    # Scheduler machine specific configuration options.
+    scheduler:
+        disabled: true # Disable kube-scheduler on the node.
+```
+
+
+</div>
+
+<hr />
+<div class="dd">
+
 <code>kubelet</code>  <i><a href="#kubeletconfig">KubeletConfig</a></i>
 
 </div>
@@ -284,7 +312,7 @@ Examples:
 
 ``` yaml
 kubelet:
-    image: ghcr.io/talos-systems/kubelet:v1.23.0-beta.0 # The `image` field is an optional reference to an alternative kubelet image.
+    image: ghcr.io/talos-systems/kubelet:v1.23.0 # The `image` field is an optional reference to an alternative kubelet image.
     # The `extraArgs` field is used to provide additional flags to the kubelet.
     extraArgs:
         feature-gates: ServerSideApply=true
@@ -1049,7 +1077,7 @@ Examples:
 
 ``` yaml
 apiServer:
-    image: k8s.gcr.io/kube-apiserver:v1.23.0-beta.0 # The container image used in the API server manifest.
+    image: k8s.gcr.io/kube-apiserver:v1.23.0 # The container image used in the API server manifest.
     # Extra arguments to supply to the API server.
     extraArgs:
         feature-gates: ServerSideApply=true
@@ -1080,7 +1108,7 @@ Examples:
 
 ``` yaml
 controllerManager:
-    image: k8s.gcr.io/kube-controller-manager:v1.23.0-beta.0 # The container image used in the controller manager manifest.
+    image: k8s.gcr.io/kube-controller-manager:v1.23.0 # The container image used in the controller manager manifest.
     # Extra arguments to supply to the controller manager.
     extraArgs:
         feature-gates: ServerSideApply=true
@@ -1106,7 +1134,7 @@ Examples:
 
 ``` yaml
 proxy:
-    image: k8s.gcr.io/kube-proxy:v1.23.0-beta.0 # The container image used in the kube-proxy manifest.
+    image: k8s.gcr.io/kube-proxy:v1.23.0 # The container image used in the kube-proxy manifest.
     mode: ipvs # proxy mode of kube-proxy.
     # Extra arguments to supply to kube-proxy.
     extraArgs:
@@ -1133,7 +1161,7 @@ Examples:
 
 ``` yaml
 scheduler:
-    image: k8s.gcr.io/kube-scheduler:v1.23.0-beta.0 # The container image used in the scheduler manifest.
+    image: k8s.gcr.io/kube-scheduler:v1.23.0 # The container image used in the scheduler manifest.
     # Extra arguments to supply to the scheduler.
     extraArgs:
         feature-gates: AllBeta=true
@@ -1405,6 +1433,104 @@ Appears in:
 
 
 
+## MachineControlPlaneConfig
+MachineControlPlaneConfig machine specific configuration options.
+
+Appears in:
+
+- <code><a href="#machineconfig">MachineConfig</a>.controlPlane</code>
+
+
+``` yaml
+# Controller manager machine specific configuration options.
+controllerManager:
+    disabled: false # Disable kube-controller-manager on the node.
+# Scheduler machine specific configuration options.
+scheduler:
+    disabled: true # Disable kube-scheduler on the node.
+```
+
+<hr />
+
+<div class="dd">
+
+<code>controllerManager</code>  <i><a href="#machinecontrollermanagerconfig">MachineControllerManagerConfig</a></i>
+
+</div>
+<div class="dt">
+
+Controller manager machine specific configuration options.
+
+</div>
+
+<hr />
+<div class="dd">
+
+<code>scheduler</code>  <i><a href="#machineschedulerconfig">MachineSchedulerConfig</a></i>
+
+</div>
+<div class="dt">
+
+Scheduler machine specific configuration options.
+
+</div>
+
+<hr />
+
+
+
+## MachineControllerManagerConfig
+MachineControllerManagerConfig represents the machine specific ControllerManager config values.
+
+Appears in:
+
+- <code><a href="#machinecontrolplaneconfig">MachineControlPlaneConfig</a>.controllerManager</code>
+
+
+
+<hr />
+
+<div class="dd">
+
+<code>disabled</code>  <i>bool</i>
+
+</div>
+<div class="dt">
+
+Disable kube-controller-manager on the node.
+
+</div>
+
+<hr />
+
+
+
+## MachineSchedulerConfig
+MachineSchedulerConfig represents the machine specific Scheduler config values.
+
+Appears in:
+
+- <code><a href="#machinecontrolplaneconfig">MachineControlPlaneConfig</a>.scheduler</code>
+
+
+
+<hr />
+
+<div class="dd">
+
+<code>disabled</code>  <i>bool</i>
+
+</div>
+<div class="dt">
+
+Disable kube-scheduler on the node.
+
+</div>
+
+<hr />
+
+
+
 ## KubeletConfig
 KubeletConfig represents the kubelet config values.
 
@@ -1414,7 +1540,7 @@ Appears in:
 
 
 ``` yaml
-image: ghcr.io/talos-systems/kubelet:v1.23.0-beta.0 # The `image` field is an optional reference to an alternative kubelet image.
+image: ghcr.io/talos-systems/kubelet:v1.23.0 # The `image` field is an optional reference to an alternative kubelet image.
 # The `extraArgs` field is used to provide additional flags to the kubelet.
 extraArgs:
     feature-gates: ServerSideApply=true
@@ -1460,7 +1586,7 @@ Examples:
 
 
 ``` yaml
-image: ghcr.io/talos-systems/kubelet:v1.23.0-beta.0
+image: ghcr.io/talos-systems/kubelet:v1.23.0
 ```
 
 
@@ -2549,7 +2675,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-apiserver:v1.23.0-beta.0 # The container image used in the API server manifest.
+image: k8s.gcr.io/kube-apiserver:v1.23.0 # The container image used in the API server manifest.
 # Extra arguments to supply to the API server.
 extraArgs:
     feature-gates: ServerSideApply=true
@@ -2577,7 +2703,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-apiserver:v1.23.0-beta.0
+image: k8s.gcr.io/kube-apiserver:v1.23.0
 ```
 
 
@@ -2644,7 +2770,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-controller-manager:v1.23.0-beta.0 # The container image used in the controller manager manifest.
+image: k8s.gcr.io/kube-controller-manager:v1.23.0 # The container image used in the controller manager manifest.
 # Extra arguments to supply to the controller manager.
 extraArgs:
     feature-gates: ServerSideApply=true
@@ -2667,7 +2793,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-controller-manager:v1.23.0-beta.0
+image: k8s.gcr.io/kube-controller-manager:v1.23.0
 ```
 
 
@@ -2710,7 +2836,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-proxy:v1.23.0-beta.0 # The container image used in the kube-proxy manifest.
+image: k8s.gcr.io/kube-proxy:v1.23.0 # The container image used in the kube-proxy manifest.
 mode: ipvs # proxy mode of kube-proxy.
 # Extra arguments to supply to kube-proxy.
 extraArgs:
@@ -2756,7 +2882,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-proxy:v1.23.0-beta.0
+image: k8s.gcr.io/kube-proxy:v1.23.0
 ```
 
 
@@ -2800,7 +2926,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-scheduler:v1.23.0-beta.0 # The container image used in the scheduler manifest.
+image: k8s.gcr.io/kube-scheduler:v1.23.0 # The container image used in the scheduler manifest.
 # Extra arguments to supply to the scheduler.
 extraArgs:
     feature-gates: AllBeta=true
@@ -2823,7 +2949,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-scheduler:v1.23.0-beta.0
+image: k8s.gcr.io/kube-scheduler:v1.23.0
 ```
 
 
@@ -4271,6 +4397,7 @@ DeviceVIPConfig contains settings for configuring a Virtual Shared IP on an inte
 Appears in:
 
 - <code><a href="#device">Device</a>.vip</code>
+- <code><a href="#vlan">Vlan</a>.vip</code>
 
 
 ``` yaml
@@ -4799,6 +4926,30 @@ Indicates if DHCP should be used.
 <div class="dt">
 
 The VLAN's ID.
+
+</div>
+
+<hr />
+<div class="dd">
+
+<code>mtu</code>  <i>uint32</i>
+
+</div>
+<div class="dt">
+
+The VLAN's MTU.
+
+</div>
+
+<hr />
+<div class="dd">
+
+<code>vip</code>  <i><a href="#devicevipconfig">DeviceVIPConfig</a></i>
+
+</div>
+<div class="dt">
+
+The VLAN's virtual IP address configuration.
 
 </div>
 

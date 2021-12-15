@@ -16,6 +16,8 @@ description: Talos gRPC API reference.
     - [Code](#common.Code)
     - [ContainerDriver](#common.ContainerDriver)
   
+    - [File-level Extensions](#common/common.proto-extensions)
+  
 - [inspect/inspect.proto](#inspect/inspect.proto)
     - [ControllerDependencyEdge](#inspect.ControllerDependencyEdge)
     - [ControllerRuntimeDependenciesResponse](#inspect.ControllerRuntimeDependenciesResponse)
@@ -107,6 +109,7 @@ description: Talos gRPC API reference.
     - [ProcessesResponse](#machine.ProcessesResponse)
     - [ReadRequest](#machine.ReadRequest)
     - [Reboot](#machine.Reboot)
+    - [RebootRequest](#machine.RebootRequest)
     - [RebootResponse](#machine.RebootResponse)
     - [Reset](#machine.Reset)
     - [ResetPartitionSpec](#machine.ResetPartitionSpec)
@@ -140,14 +143,10 @@ description: Talos gRPC API reference.
     - [Shutdown](#machine.Shutdown)
     - [ShutdownResponse](#machine.ShutdownResponse)
     - [SoftIRQStat](#machine.SoftIRQStat)
-    - [StartRequest](#machine.StartRequest)
-    - [StartResponse](#machine.StartResponse)
     - [Stat](#machine.Stat)
     - [Stats](#machine.Stats)
     - [StatsRequest](#machine.StatsRequest)
     - [StatsResponse](#machine.StatsResponse)
-    - [StopRequest](#machine.StopRequest)
-    - [StopResponse](#machine.StopResponse)
     - [SystemStat](#machine.SystemStat)
     - [SystemStatResponse](#machine.SystemStatResponse)
     - [TaskEvent](#machine.TaskEvent)
@@ -161,6 +160,7 @@ description: Talos gRPC API reference.
     - [ListRequest.Type](#machine.ListRequest.Type)
     - [MachineConfig.MachineType](#machine.MachineConfig.MachineType)
     - [PhaseEvent.Action](#machine.PhaseEvent.Action)
+    - [RebootRequest.Mode](#machine.RebootRequest.Mode)
     - [SequenceEvent.Action](#machine.SequenceEvent.Action)
     - [ServiceStateEvent.Action](#machine.ServiceStateEvent.Action)
     - [TaskEvent.Action](#machine.TaskEvent.Action)
@@ -337,6 +337,19 @@ Common metadata message nested in all reply message types
 
 
  <!-- end enums -->
+
+
+<a name="common/common.proto-extensions"></a>
+
+### File-level Extensions
+| Extension | Type | Base | Number | Description |
+| --------- | ---- | ---- | ------ | ----------- |
+| remove_deprecated_enum | string | .google.protobuf.EnumOptions | 93117 | Indicates the Talos version when this deprecated enum will be removed from API. |
+| remove_deprecated_enum_value | string | .google.protobuf.EnumValueOptions | 93117 | Indicates the Talos version when this deprecated enum value will be removed from API. |
+| remove_deprecated_field | string | .google.protobuf.FieldOptions | 93117 | Indicates the Talos version when this deprecated filed will be removed from API. |
+| remove_deprecated_message | string | .google.protobuf.MessageOptions | 93117 | Indicates the Talos version when this deprecated message will be removed from API. |
+| remove_deprecated_method | string | .google.protobuf.MethodOptions | 93117 | Indicates the Talos version when this deprecated method will be removed from API. |
+| remove_deprecated_service | string | .google.protobuf.ServiceOptions | 93117 | Indicates the Talos version when this deprecated service will be removed from API. |
 
  <!-- end HasExtensions -->
 
@@ -1258,9 +1271,7 @@ FileInfo describes a file or directory's information
 | name | [string](#string) |  | Name is the name (including prefixed path) of the file or directory |
 | size | [int64](#int64) |  | Size indicates the number of bytes contained within the file |
 | mode | [uint32](#uint32) |  | Mode is the bitmap of UNIX mode/permission flags of the file |
-| modified | [int64](#int64) |  | Modified indicates the UNIX timestamp at which the file was last modified
-
-TODO: unix timestamp or include proto's Date type |
+| modified | [int64](#int64) |  | Modified indicates the UNIX timestamp at which the file was last modified |
 | is_dir | [bool](#bool) |  | IsDir indicates that the file is a directory |
 | error | [string](#string) |  | Error describes any error encountered while trying to read the file information. |
 | link | [string](#string) |  | Link is filled with symlink target |
@@ -1857,13 +1868,27 @@ rpc processes
 <a name="machine.Reboot"></a>
 
 ### Reboot
-rpc reboot
 The reboot message containing the reboot status.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | metadata | [common.Metadata](#common.Metadata) |  |  |
+
+
+
+
+
+
+<a name="machine.RebootRequest"></a>
+
+### RebootRequest
+rpc reboot
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| mode | [RebootRequest.Mode](#machine.RebootRequest.Mode) |  |  |
 
 
 
@@ -2395,36 +2420,6 @@ The messages message containing the shutdown status.
 
 
 
-<a name="machine.StartRequest"></a>
-
-### StartRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="machine.StartResponse"></a>
-
-### StartResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| resp | [string](#string) |  |  |
-
-
-
-
-
-
 <a name="machine.Stat"></a>
 
 ### Stat
@@ -2486,36 +2481,6 @@ The request message containing the containerd namespace.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | messages | [Stats](#machine.Stats) | repeated |  |
-
-
-
-
-
-
-<a name="machine.StopRequest"></a>
-
-### StopRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="machine.StopResponse"></a>
-
-### StopResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| resp | [string](#string) |  |  |
 
 
 
@@ -2707,7 +2672,7 @@ File type.
 | TYPE_INIT | 1 |  |
 | TYPE_CONTROL_PLANE | 2 |  |
 | TYPE_WORKER | 3 |  |
-| TYPE_JOIN | 3 | Alias for TYPE_WORKER. |
+| TYPE_JOIN | 3 | Deprecated alias for TYPE_WORKER. It will be removed in v0.15. |
 
 
 
@@ -2720,6 +2685,18 @@ File type.
 | ---- | ------ | ----------- |
 | START | 0 |  |
 | STOP | 1 |  |
+
+
+
+<a name="machine.RebootRequest.Mode"></a>
+
+### RebootRequest.Mode
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DEFAULT | 0 |  |
+| POWERCYCLE | 1 |  |
 
 
 
@@ -2778,7 +2755,11 @@ The machine service definition.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | ApplyConfiguration | [ApplyConfigurationRequest](#machine.ApplyConfigurationRequest) | [ApplyConfigurationResponse](#machine.ApplyConfigurationResponse) |  |
-| Bootstrap | [BootstrapRequest](#machine.BootstrapRequest) | [BootstrapResponse](#machine.BootstrapResponse) |  |
+| Bootstrap | [BootstrapRequest](#machine.BootstrapRequest) | [BootstrapResponse](#machine.BootstrapResponse) | Bootstrap method makes control plane node enter etcd bootstrap mode.
+
+Node aborts etcd join sequence and creates single-node etcd cluster.
+
+If recover_etcd argument is specified, etcd is recovered from a snapshot uploaded with EtcdRecover. |
 | Containers | [ContainersRequest](#machine.ContainersRequest) | [ContainersResponse](#machine.ContainersResponse) |  |
 | Copy | [CopyRequest](#machine.CopyRequest) | [.common.Data](#common.Data) stream |  |
 | CPUInfo | [.google.protobuf.Empty](#google.protobuf.Empty) | [CPUInfoResponse](#machine.CPUInfoResponse) |  |
@@ -2807,7 +2788,7 @@ This method is available only on control plane nodes (which run etcd). |
 | NetworkDeviceStats | [.google.protobuf.Empty](#google.protobuf.Empty) | [NetworkDeviceStatsResponse](#machine.NetworkDeviceStatsResponse) |  |
 | Processes | [.google.protobuf.Empty](#google.protobuf.Empty) | [ProcessesResponse](#machine.ProcessesResponse) |  |
 | Read | [ReadRequest](#machine.ReadRequest) | [.common.Data](#common.Data) stream |  |
-| Reboot | [.google.protobuf.Empty](#google.protobuf.Empty) | [RebootResponse](#machine.RebootResponse) |  |
+| Reboot | [RebootRequest](#machine.RebootRequest) | [RebootResponse](#machine.RebootResponse) |  |
 | Restart | [RestartRequest](#machine.RestartRequest) | [RestartResponse](#machine.RestartResponse) |  |
 | Rollback | [RollbackRequest](#machine.RollbackRequest) | [RollbackResponse](#machine.RollbackResponse) |  |
 | Reset | [ResetRequest](#machine.ResetRequest) | [ResetResponse](#machine.ResetResponse) |  |

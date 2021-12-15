@@ -357,7 +357,7 @@ func buildInitialCluster(ctx context.Context, r runtime.Runtime, name, ip string
 		lastNag time.Time
 	)
 
-	err = retry.Constant(10*time.Minute,
+	err = retry.Constant(constants.EtcdJoinTimeout,
 		retry.WithUnits(3*time.Second),
 		retry.WithJitter(time.Second),
 		retry.WithErrorLogging(true),
@@ -679,6 +679,8 @@ func primaryAndListenAddresses(subnet string) (primary, listen string, err error
 	if err != nil {
 		return "", "", fmt.Errorf("failed to discover interface IP addresses: %w", err)
 	}
+
+	ips = net.IPFilter(ips, network.NotSideroLinkStdIP)
 
 	if len(ips) == 0 {
 		return "", "", errors.New("no valid unicast IP addresses on any interface")
