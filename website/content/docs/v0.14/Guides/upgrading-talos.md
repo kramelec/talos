@@ -14,7 +14,7 @@ To see a live demo of this writeup, see the video below:
 
 ### After Upgrade to 0.14
 
-TBD
+No actions required.
 
 ## `talosctl` Upgrade
 
@@ -56,4 +56,5 @@ future.
 
 ## Machine Configuration Changes
 
-TBD
+Talos 0.14 enables cluster discovery by default for new clusters.
+Cluster discovery feature  won't be enabled after an upgrade if the feature wasn't enabled before the upgrade.
