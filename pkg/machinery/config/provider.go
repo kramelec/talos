@@ -5,7 +5,6 @@
 package config
 
 import (
-	"context"
 	"crypto/tls"
 	"net"
 	"net/url"
@@ -28,7 +27,6 @@ type Provider interface {
 	Cluster() ClusterConfig
 	// Validate checks configuration and returns warnings and fatal errors (as multierror).
 	Validate(RuntimeMode, ...ValidationOption) ([]string, error)
-	ApplyDynamicConfig(context.Context, DynamicConfigProvider) error
 	String(encoderOptions ...encoder.Option) (string, error)
 	Bytes(encoderOptions ...encoder.Option) ([]byte, error)
 }
@@ -52,6 +50,7 @@ type MachineConfig interface {
 	Features() Features
 	Udev() UdevConfig
 	Logging() Logging
+	Kernel() Kernel
 }
 
 // Disk represents the options available for partitioning, formatting, and
@@ -516,4 +515,14 @@ type Logging interface {
 type LoggingDestination interface {
 	Endpoint() *url.URL
 	Format() string
+}
+
+// Kernel describes Talos Linux kernel configuration.
+type Kernel interface {
+	Modules() []KernelModule
+}
+
+// KernelModule describes Linux module to load.
+type KernelModule interface {
+	Name() string
 }
