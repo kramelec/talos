@@ -13,7 +13,7 @@ NAME = Talos
 
 ARTIFACTS := _out
 TOOLS ?= ghcr.io/talos-systems/tools:v0.10.0-alpha.0
-PKGS ?= v0.10.0-alpha.0-3-g950361f
+PKGS ?= v0.10.0-alpha.0-4-g2779c3f
 EXTRAS ?= v0.8.0-alpha.0
 GO_VERSION ?= 1.17
 GOFUMPT_VERSION ?= v0.1.1
@@ -223,6 +223,8 @@ image-%: ## Builds the specified image. Valid options are aws, azure, digital-oc
 		arch=`basename "$${platform}"` ; \
 		docker run --rm -v /dev:/dev --privileged $(REGISTRY_AND_USERNAME)/imager:$(IMAGE_TAG) image --platform $* --arch $$arch --tar-to-stdout | tar xz -C $(ARTIFACTS) ; \
 	done
+
+images-essential: image-aws image-gcp image-metal ## Builds only essential images used in the CI (AWS, GCP, and Metal).
 
 images: image-aws image-azure image-digital-ocean image-gcp image-hcloud image-metal image-nocloud image-openstack image-scaleway image-upcloud image-vmware image-vultr ## Builds all known images (AWS, Azure, DigitalOcean, GCP, HCloud, Metal, NoCloud, Openstack, Scaleway, UpCloud, Vultr and VMware).
 
