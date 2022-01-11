@@ -12,13 +12,14 @@ DOCKER_LOGIN_ENABLED ?= true
 NAME = Talos
 
 ARTIFACTS := _out
-TOOLS ?= ghcr.io/talos-systems/tools:v0.10.0-alpha.0
-PKGS ?= v0.10.0-alpha.0-4-g2779c3f
-EXTRAS ?= v0.8.0-alpha.0
+TOOLS ?= ghcr.io/talos-systems/tools:v0.10.0-alpha.0-1-g67314b1
+PKGS ?= v0.10.0-alpha.0-9-g6ce1a40
+EXTRAS ?= v0.8.0-alpha.0-1-g7c1f3cc
 GO_VERSION ?= 1.17
 GOFUMPT_VERSION ?= v0.1.1
 GOLANGCILINT_VERSION ?= v1.43.0
 STRINGER_VERSION ?= v0.1.5
+ENUMER_VERSION ?= v1.1.2
 DEEPCOPY_GEN_VERSION ?= v0.21.3
 VTPROTOBUF_VERSION ?= v0.2.0
 IMPORTVET ?= ghcr.io/talos-systems/importvet:c9424fe
@@ -82,6 +83,7 @@ COMMON_ARGS += --build-arg=PKGS=$(PKGS)
 COMMON_ARGS += --build-arg=EXTRAS=$(EXTRAS)
 COMMON_ARGS += --build-arg=GOFUMPT_VERSION=$(GOFUMPT_VERSION)
 COMMON_ARGS += --build-arg=STRINGER_VERSION=$(STRINGER_VERSION)
+COMMON_ARGS += --build-arg=ENUMER_VERSION=$(ENUMER_VERSION)
 COMMON_ARGS += --build-arg=DEEPCOPY_GEN_VERSION=$(DEEPCOPY_GEN_VERSION)
 COMMON_ARGS += --build-arg=VTPROTOBUF_VERSION=$(VTPROTOBUF_VERSION)
 COMMON_ARGS += --build-arg=TAG=$(TAG)

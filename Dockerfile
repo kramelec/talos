@@ -102,6 +102,9 @@ RUN go install mvdan.cc/gofumpt/gofumports@${GOFUMPT_VERSION} \
 ARG STRINGER_VERSION
 RUN go install golang.org/x/tools/cmd/stringer@${STRINGER_VERSION} \
     && mv /go/bin/stringer /toolchain/go/bin/stringer
+ARG ENUMER_VERSION
+RUN go install github.com/alvaroloes/enumer@${ENUMER_VERSION} \
+    && mv /go/bin/enumer /toolchain/go/bin/enumer
 ARG DEEPCOPY_GEN_VERSION
 RUN go install k8s.io/code-generator/cmd/deepcopy-gen@${DEEPCOPY_GEN_VERSION} \
     && mv /go/bin/deepcopy-gen /toolchain/go/bin/deepcopy-gen
@@ -377,9 +380,7 @@ COPY ./hack/cleanup.sh /toolchain/bin/cleanup.sh
 RUN cleanup.sh /rootfs
 COPY --chmod=0644 hack/containerd.toml /rootfs/etc/containerd/config.toml
 COPY --chmod=0644 hack/cri-containerd.toml /rootfs/etc/cri/containerd.toml
-RUN touch /rootfs/etc/resolv.conf
-RUN touch /rootfs/etc/hosts
-RUN touch /rootfs/etc/os-release
+RUN touch /rootfs/etc/{resolv.conf,hosts,os-release,machine-id}
 RUN mkdir -pv /rootfs/{boot,usr/local/share,mnt,system,opt}
 RUN mkdir -pv /rootfs/{etc/kubernetes/manifests,etc/cni/net.d,usr/libexec/kubernetes}
 RUN mkdir -pv /rootfs/opt/{containerd/bin,containerd/lib}
@@ -421,9 +422,7 @@ COPY ./hack/cleanup.sh /toolchain/bin/cleanup.sh
 RUN cleanup.sh /rootfs
 COPY --chmod=0644 hack/containerd.toml /rootfs/etc/containerd/containerd.toml
 COPY --chmod=0644 hack/cri-containerd.toml /rootfs/etc/cri/containerd.toml
-RUN touch /rootfs/etc/resolv.conf
-RUN touch /rootfs/etc/hosts
-RUN touch /rootfs/etc/os-release
+RUN touch /rootfs/etc/{resolv.conf,hosts,os-release,machine-id}
 RUN mkdir -pv /rootfs/{boot,usr/local/share,mnt,system,opt}
 RUN mkdir -pv /rootfs/{etc/kubernetes/manifests,etc/cni/net.d,usr/libexec/kubernetes}
 RUN mkdir -pv /rootfs/opt/{containerd/bin,containerd/lib}
