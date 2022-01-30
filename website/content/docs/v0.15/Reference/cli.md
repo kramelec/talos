@@ -91,13 +91,14 @@ talosctl cluster create [flags]
       --bad-rtc                                 launch VM with bad RTC state (QEMU only)
       --cidr string                             CIDR of the cluster network (IPv4, ULA network for IPv6 is derived in automated way) (default "10.5.0.0/24")
       --cni-bin-path strings                    search path for CNI binaries (VM only) (default [/home/user/.talos/cni/bin])
-      --cni-bundle-url string                   URL to download CNI bundle from (VM only) (default "https://github.com/talos-systems/talos/releases/download/v0.15.0-alpha.0/talosctl-cni-bundle-${ARCH}.tar.gz")
+      --cni-bundle-url string                   URL to download CNI bundle from (VM only) (default "https://github.com/talos-systems/talos/releases/download/v0.15.0-alpha.1/talosctl-cni-bundle-${ARCH}.tar.gz")
       --cni-cache-dir string                    CNI cache directory path (VM only) (default "/home/user/.talos/cni/cache")
       --cni-conf-dir string                     CNI config directory path (VM only) (default "/home/user/.talos/cni/conf.d")
       --config-patch string                     patch generated machineconfigs (applied to all node types)
       --config-patch-control-plane string       patch generated machineconfigs (applied to 'init' and 'controlplane' types)
       --config-patch-worker string              patch generated machineconfigs (applied to 'worker' type)
-      --cpus string                             the share of CPUs as fraction (each container/VM) (default "2.0")
+      --cpus string                             the share of CPUs as fraction (each control plane/VM) (default "2.0")
+      --cpus-workers string                     the share of CPUs as fraction (each worker/VM) (default "2.0")
       --crashdump                               print debug crashdump to stderr when cluster startup fails
       --custom-cni-url string                   install custom CNI from the URL (Talos cluster)
       --disk int                                default limit on disk size in MB (each VM) (default 6144)
@@ -109,6 +110,9 @@ talosctl cluster create [flags]
       --endpoint string                         use endpoint instead of provider defaults
   -p, --exposed-ports string                    Comma-separated list of ports/protocols to expose on init node. Ex -p <hostPort>:<containerPort>/<protocol (tcp or udp)> (Docker provisioner only)
       --extra-boot-kernel-args string           add extra kernel args to the initial boot from vmlinuz and initramfs (QEMU only)
+      --extra-disks int                         number of extra disks to create for each worker VM
+      --extra-disks-size int                    default limit on disk size in MB (each VM) (default 5120)
+      --extra-uefi-search-paths strings         additional search paths for UEFI firmware (only applies when UEFI is enabled)
   -h, --help                                    help for create
       --image string                            the image to use (default "ghcr.io/talos-systems/talos:latest")
       --init-node-as-endpoint                   use init node as endpoint instead of any load balancer endpoint
@@ -118,9 +122,10 @@ talosctl cluster create [flags]
       --ipv4                                    enable IPv4 network in the cluster (default true)
       --ipv6                                    enable IPv6 network in the cluster (QEMU provisioner only)
       --iso-path string                         the ISO path to use for the initial boot (VM only)
-      --kubernetes-version string               desired kubernetes version to run (default "1.23.1")
+      --kubernetes-version string               desired kubernetes version to run (default "1.23.3")
       --masters int                             the number of masters to create (default 1)
-      --memory int                              the limit on memory usage in MB (each container/VM) (default 2048)
+      --memory int                              the limit on memory usage in MB (each control plane/VM) (default 2048)
+      --memory-workers int                      the limit on memory usage in MB (each worker/VM) (default 2048)
       --mtu int                                 MTU of the cluster network (default 1500)
       --nameservers strings                     list of nameservers to use (default [8.8.8.8,1.1.1.1,2001:4860:4860::8888,2606:4700:4700::1111])
       --registry-insecure-skip-verify strings   list of registry hostnames to skip TLS verification for
@@ -1992,7 +1997,7 @@ talosctl upgrade-k8s [flags]
       --endpoint string   the cluster control plane endpoint
       --from string       the Kubernetes control plane version to upgrade from
   -h, --help              help for upgrade-k8s
-      --to string         the Kubernetes control plane version to upgrade to (default "1.23.1")
+      --to string         the Kubernetes control plane version to upgrade to (default "1.23.3")
       --upgrade-kubelet   upgrade kubelet service (default true)
 ```
 

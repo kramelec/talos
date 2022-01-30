@@ -148,6 +148,10 @@ install:
     # diskSelector:
     #     size: 4GB # Disk size.
     #     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+    #     busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
+
+    # # Allows for supplying additional system extension images to install on top of base Talos image.
+    # extensions: ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
 ```
 
 <hr />
@@ -312,7 +316,7 @@ Examples:
 
 ``` yaml
 kubelet:
-    image: ghcr.io/talos-systems/kubelet:v1.23.1 # The `image` field is an optional reference to an alternative kubelet image.
+    image: ghcr.io/talos-systems/kubelet:v1.23.3 # The `image` field is an optional reference to an alternative kubelet image.
     # The `extraArgs` field is used to provide additional flags to the kubelet.
     extraArgs:
         feature-gates: ServerSideApply=true
@@ -509,6 +513,10 @@ install:
     # diskSelector:
     #     size: 4GB # Disk size.
     #     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+    #     busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
+
+    # # Allows for supplying additional system extension images to install on top of base Talos image.
+    # extensions: ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
 ```
 
 
@@ -1102,7 +1110,7 @@ Examples:
 
 ``` yaml
 apiServer:
-    image: k8s.gcr.io/kube-apiserver:v1.23.1 # The container image used in the API server manifest.
+    image: k8s.gcr.io/kube-apiserver:v1.23.3 # The container image used in the API server manifest.
     # Extra arguments to supply to the API server.
     extraArgs:
         feature-gates: ServerSideApply=true
@@ -1133,7 +1141,7 @@ Examples:
 
 ``` yaml
 controllerManager:
-    image: k8s.gcr.io/kube-controller-manager:v1.23.1 # The container image used in the controller manager manifest.
+    image: k8s.gcr.io/kube-controller-manager:v1.23.3 # The container image used in the controller manager manifest.
     # Extra arguments to supply to the controller manager.
     extraArgs:
         feature-gates: ServerSideApply=true
@@ -1159,7 +1167,7 @@ Examples:
 
 ``` yaml
 proxy:
-    image: k8s.gcr.io/kube-proxy:v1.23.1 # The container image used in the kube-proxy manifest.
+    image: k8s.gcr.io/kube-proxy:v1.23.3 # The container image used in the kube-proxy manifest.
     mode: ipvs # proxy mode of kube-proxy.
     # Extra arguments to supply to kube-proxy.
     extraArgs:
@@ -1186,7 +1194,7 @@ Examples:
 
 ``` yaml
 scheduler:
-    image: k8s.gcr.io/kube-scheduler:v1.23.1 # The container image used in the scheduler manifest.
+    image: k8s.gcr.io/kube-scheduler:v1.23.3 # The container image used in the scheduler manifest.
     # Extra arguments to supply to the scheduler.
     extraArgs:
         feature-gates: AllBeta=true
@@ -1275,7 +1283,7 @@ Examples:
 
 ``` yaml
 coreDNS:
-    image: docker.io/coredns/coredns:1.8.6 # The `image` field is an override to the default coredns image.
+    image: docker.io/coredns/coredns:1.8.7 # The `image` field is an override to the default coredns image.
 ```
 
 
@@ -1565,7 +1573,7 @@ Appears in:
 
 
 ``` yaml
-image: ghcr.io/talos-systems/kubelet:v1.23.1 # The `image` field is an optional reference to an alternative kubelet image.
+image: ghcr.io/talos-systems/kubelet:v1.23.3 # The `image` field is an optional reference to an alternative kubelet image.
 # The `extraArgs` field is used to provide additional flags to the kubelet.
 extraArgs:
     feature-gates: ServerSideApply=true
@@ -1611,7 +1619,7 @@ Examples:
 
 
 ``` yaml
-image: ghcr.io/talos-systems/kubelet:v1.23.1
+image: ghcr.io/talos-systems/kubelet:v1.23.3
 ```
 
 
@@ -2065,6 +2073,10 @@ wipe: false # Indicates if the installation disk should be wiped at installation
 # diskSelector:
 #     size: 4GB # Disk size.
 #     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+#     busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
+
+# # Allows for supplying additional system extension images to install on top of base Talos image.
+# extensions: ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
 ```
 
 <hr />
@@ -2114,6 +2126,7 @@ Examples:
 diskSelector:
     size: 4GB # Disk size.
     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+    busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
 ```
 
 
@@ -2162,6 +2175,28 @@ Examples:
 
 ``` yaml
 image: ghcr.io/talos-systems/installer:latest
+```
+
+
+</div>
+
+<hr />
+<div class="dd">
+
+<code>extensions</code>  <i>[]<a href="#installextensionconfig">InstallExtensionConfig</a></i>
+
+</div>
+<div class="dt">
+
+Allows for supplying additional system extension images to install on top of base Talos image.
+
+
+
+Examples:
+
+
+``` yaml
+extensions: ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
 ```
 
 
@@ -2242,6 +2277,7 @@ Appears in:
 ``` yaml
 size: 4GB # Disk size.
 model: WDC* # Disk model `/sys/block/<dev>/device/model`.
+busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
 ```
 
 <hr />
@@ -2368,6 +2404,61 @@ Valid values:
   - <code>nvme</code>
 
   - <code>sd</code>
+</div>
+
+<hr />
+<div class="dd">
+
+<code>busPath</code>  <i>string</i>
+
+</div>
+<div class="dt">
+
+Disk bus path.
+
+
+
+Examples:
+
+
+``` yaml
+busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0
+```
+
+``` yaml
+busPath: /pci0000:00/*
+```
+
+
+</div>
+
+<hr />
+
+
+
+## InstallExtensionConfig
+InstallExtensionConfig represents a configuration for a system extension.
+
+Appears in:
+
+- <code><a href="#installconfig">InstallConfig</a>.extensions</code>
+
+
+``` yaml
+ghcr.io/talos-systems/gvisor:20220117.0-v1.0.0
+```
+
+<hr />
+
+<div class="dd">
+
+<code>image</code>  <i>string</i>
+
+</div>
+<div class="dt">
+
+System extension image.
+
 </div>
 
 <hr />
@@ -2575,7 +2666,7 @@ Appears in:
 
 
 ``` yaml
-image: docker.io/coredns/coredns:1.8.6 # The `image` field is an override to the default coredns image.
+image: docker.io/coredns/coredns:1.8.7 # The `image` field is an override to the default coredns image.
 ```
 
 <hr />
@@ -2700,7 +2791,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-apiserver:v1.23.1 # The container image used in the API server manifest.
+image: k8s.gcr.io/kube-apiserver:v1.23.3 # The container image used in the API server manifest.
 # Extra arguments to supply to the API server.
 extraArgs:
     feature-gates: ServerSideApply=true
@@ -2728,7 +2819,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-apiserver:v1.23.1
+image: k8s.gcr.io/kube-apiserver:v1.23.3
 ```
 
 
@@ -2795,7 +2886,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-controller-manager:v1.23.1 # The container image used in the controller manager manifest.
+image: k8s.gcr.io/kube-controller-manager:v1.23.3 # The container image used in the controller manager manifest.
 # Extra arguments to supply to the controller manager.
 extraArgs:
     feature-gates: ServerSideApply=true
@@ -2818,7 +2909,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-controller-manager:v1.23.1
+image: k8s.gcr.io/kube-controller-manager:v1.23.3
 ```
 
 
@@ -2861,7 +2952,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-proxy:v1.23.1 # The container image used in the kube-proxy manifest.
+image: k8s.gcr.io/kube-proxy:v1.23.3 # The container image used in the kube-proxy manifest.
 mode: ipvs # proxy mode of kube-proxy.
 # Extra arguments to supply to kube-proxy.
 extraArgs:
@@ -2907,7 +2998,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-proxy:v1.23.1
+image: k8s.gcr.io/kube-proxy:v1.23.3
 ```
 
 
@@ -2951,7 +3042,7 @@ Appears in:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-scheduler:v1.23.1 # The container image used in the scheduler manifest.
+image: k8s.gcr.io/kube-scheduler:v1.23.3 # The container image used in the scheduler manifest.
 # Extra arguments to supply to the scheduler.
 extraArgs:
     feature-gates: AllBeta=true
@@ -2974,7 +3065,7 @@ Examples:
 
 
 ``` yaml
-image: k8s.gcr.io/kube-scheduler:v1.23.1
+image: k8s.gcr.io/kube-scheduler:v1.23.3
 ```
 
 
@@ -5157,6 +5248,7 @@ tls:
 <div class="dt">
 
 The auth configuration for this registry.
+Note: changes to the registry auth will not be picked up by the CRI containerd plugin without a reboot.
 
 
 
